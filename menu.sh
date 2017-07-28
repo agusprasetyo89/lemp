@@ -44,7 +44,9 @@ if [[ ${NEWPASSWD} == ${CONFIRMPASSWD} ]];then
 mysqlroot_pass=${CONFIRMPASSWD}
 echo ""
 # INSTALLING ALL THE LEMP PACKAGE
-
+echo "[client]
+user=root
+password="\"${mysqlroot_pass}"\"" >> .my.cnf
 echo ""
 echo -e "${RED}INSTALLING LAMP PACKAGE${RESET}"
 echo -e '```````````````````````'
