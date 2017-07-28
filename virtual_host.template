@@ -1,0 +1,27 @@
+server {
+        listen       80;
+        server_name  www.DOMAIN DOMAIN ;
+        access_log   /var/log/nginx/DOMAIN_access.log combined;
+        error_page 404 /index.php;
+location / {
+            root           ROOT;
+            index   index.php index.html;
+            }
+ location ~ \.php$ {
+            root           ROOT;
+            index   index.php;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_read_timeout 500;
+            fastcgi_intercept_errors off;
+            fastcgi_param  SCRIPT_FILENAME  ROOT$fastcgi_script_name;
+             include        fastcgi_params;
+        }
+
+location ~* \.(?:ico|css|js|gif|jpe?g|png)$ {
+                expires max;
+                add_header Pragma public;
+                add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+                root           ROOT;
+        }
+}
