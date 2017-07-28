@@ -19,6 +19,8 @@ echo -e "${RESET}"
 		read -p "Select an option [1-4]: " option
 		case $option in
 			1) 
+			cd /root
+			rm -f www.conf
 wget https://raw.githubusercontent.com/pembodohan89/new/master/www.conf
 echo -e "${GREEN}"
 echo "##################################################"
@@ -47,7 +49,7 @@ echo ""
 
 echo "[client]
 user=root
-password="\"${mysqlroot_pass}" " >> .my.cnf
+password="\"${mysqlroot_pass}\" " >> .my.cnf
 # INSTALLING ALL THE LEMP PACKAGE
 
 echo ""
