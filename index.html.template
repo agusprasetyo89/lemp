@@ -1,0 +1,43 @@
+<?PHP
+
+function getUserIP()
+{
+    $client  = @$_SERVER['HTTP_CLIENT_IP'];
+    $forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+    $remote  = $_SERVER['REMOTE_ADDR'];
+
+    if(filter_var($client, FILTER_VALIDATE_IP))
+    {
+        $ip = $client;
+    }
+    elseif(filter_var($forward, FILTER_VALIDATE_IP))
+    {
+        $ip = $forward;
+    }
+    else
+    {
+        $ip = $remote;
+    }
+
+    return $ip;
+}
+
+$domain =  $_SERVER['HTTP_HOST'];;
+$user_ip = getUserIP();
+
+
+?>
+
+
+
+<html>
+  <head></head>
+  <body style="width: 100%; height: 90%;">
+
+    <div style="top: 50%; left: 20%; right:20%; position: absolute;">
+     <?php echo "<p align='center'> <font color=green><strong>Welcome To</font> $domain </strong></br>
+<font color=green><strong>Your IP is </font> <font color=red>$user_ip </font></strong></p>" ; ?>
+    </div>
+
+  </body>
+</html>
