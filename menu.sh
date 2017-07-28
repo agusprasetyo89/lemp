@@ -22,12 +22,11 @@ echo -e "${RESET}"
 wget https://raw.githubusercontent.com/pembodohan89/new/master/www.conf
 echo -e "${GREEN}"
 echo "##################################################"
-echo "############## AUTO LEMP INSTALLER ###############"
+echo "############## AUTO LAMP INSTALLER ###############"
 echo "################### Created By ###################"
 echo "################# Agus Prasetyo ##################"
 echo "##################################################"
 # READING THE PASSWORD
-echo -e "${RESET}"
 echo -ne "Please type your Mysql password: "
 read -s NEWPASSWD
 echo ""
@@ -72,7 +71,7 @@ echo -e "${RED} [ FAILED ]${RESET}"
 fi
 done
 # COPY PHP-FPM CONFIG
-cp /root/www.conf /etc/php-fpm.d/www.conf
+cp /root/sh/www.conf /etc/php-fpm.d/www.conf
 #RESTARTING SERVICES
 echo ""
 echo -e "${RED}RESTARTING SERVICES ${RESET}"
