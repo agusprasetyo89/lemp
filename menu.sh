@@ -44,9 +44,6 @@ if [[ ${NEWPASSWD} == ${CONFIRMPASSWD} ]];then
 mysqlroot_pass=${CONFIRMPASSWD}
 echo ""
 # INSTALLING ALL THE LEMP PACKAGE
-echo "[client]
-user=root
-password="\"${mysqlroot_pass}"\"" >> .my.cnf
 echo ""
 echo -e "${RED}INSTALLING LAMP PACKAGE${RESET}"
 echo -e '```````````````````````'
@@ -123,6 +120,9 @@ echo -e "${RED} [ FAILED ]${RESET}"
 fi
 #FINAL RESTARTING OF THE SERICE
 service ${service} restart &> /dev/null
+echo "[client]
+user=root
+password="\"${mysqlroot_pass}"\"" >> .my.cnf
 else
 echo ""
 echo -e "${RED}Sorry, passwords do not match.${RESET}"
