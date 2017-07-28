@@ -132,7 +132,7 @@ fi
 			2)
 wget https://raw.githubusercontent.com/pembodohan89/new/master/virtual_host.template
 wget https://raw.githubusercontent.com/pembodohan89/new/master/index.html.template
-			NGINX_CONFIG='/etc/nginx/conf.d'
+NGINX_CONFIG='/etc/nginx/conf.d'
 WEB_DIR='/home'
 SED=`which sed`
 CURRENT_DIR=`dirname $0`
@@ -161,7 +161,7 @@ SITE_DIR=`echo $DOMAIN | $SED 's/\./_/g'`
 
 # Now we need to copy the virtual host template
 CONFIG=$NGINX_CONFIG/$DOMAIN.conf
-cp /root/virtual_host.template $CONFIG
+cp /root/sh/virtual_host.template $CONFIG
 $SED -i "s/DOMAIN/$DOMAIN/g" $CONFIG
 $SED -i "s!ROOT!$WEB_DIR/$SITE_DIR!g" $CONFIG
 
@@ -172,7 +172,7 @@ mkdir $WEB_DIR/$SITE_DIR
 /etc/init.d/nginx reload
 
 # put the template index.html file into the new domains web dir
-cp /root/index.html.template $WEB_DIR/$SITE_DIR/index.php
+cp /root/sh/index.html.template $WEB_DIR/$SITE_DIR/index.php
 chown nginx:nginx -R $WEB_DIR/$SITE_DIR
 chmod 600 $CONFIG
 chmod -R 755 $WEB_DIR/$SITE_DIR
