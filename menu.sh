@@ -19,8 +19,6 @@ echo -e "${RESET}"
 		read -p "Select an option [1-4]: " option
 		case $option in
 			1) 
-			cd /root
-			rm -f /root/www.conf
 wget https://raw.githubusercontent.com/pembodohan89/new/master/www.conf
 echo -e "${GREEN}"
 echo "##################################################"
@@ -46,8 +44,6 @@ if [[ ${NEWPASSWD} == ${CONFIRMPASSWD} ]];then
 # IF EVRYTHING WORK mysqlroot_pass VARIABLE CONTAIN THE PASSWORD FOR MySQL
 mysqlroot_pass=${CONFIRMPASSWD}
 echo ""
-
-
 # INSTALLING ALL THE LEMP PACKAGE
 
 echo ""
