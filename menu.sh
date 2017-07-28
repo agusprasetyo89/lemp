@@ -70,7 +70,7 @@ echo -e "${RED} [ FAILED ]${RESET}"
 fi
 done
 # COPY PHP-FPM CONFIG
-cp /root/sh/www.conf /etc/php-fpm.d/www.conf
+cp /root/www.conf /etc/php-fpm.d/www.conf
 #RESTARTING SERVICES
 echo ""
 echo -e "${RED}RESTARTING SERVICES ${RESET}"
