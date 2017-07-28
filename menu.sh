@@ -20,7 +20,7 @@ echo -e "${RESET}"
 		case $option in
 			1) 
 			cd /root
-			rm -f www.conf
+			rm -f /root/www.conf
 wget https://raw.githubusercontent.com/pembodohan89/new/master/www.conf
 echo -e "${GREEN}"
 echo "##################################################"
@@ -47,9 +47,7 @@ if [[ ${NEWPASSWD} == ${CONFIRMPASSWD} ]];then
 mysqlroot_pass=${CONFIRMPASSWD}
 echo ""
 
-echo "[client]
-user=root
-password="\"${mysqlroot_pass}\"" >> .my.cnf
+
 # INSTALLING ALL THE LEMP PACKAGE
 
 echo ""
