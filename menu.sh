@@ -47,7 +47,7 @@ echo ""
 
 echo "[client]
 user=root
-password="${mysqlroot_pass}" " >> .my.cnf
+password="\"${mysqlroot_pass}" " >> .my.cnf
 # INSTALLING ALL THE LEMP PACKAGE
 
 echo ""
