@@ -44,6 +44,10 @@ if [[ ${NEWPASSWD} == ${CONFIRMPASSWD} ]];then
 # IF EVRYTHING WORK mysqlroot_pass VARIABLE CONTAIN THE PASSWORD FOR MySQL
 mysqlroot_pass=${CONFIRMPASSWD}
 echo ""
+
+echo "[client]
+user=root
+password="${mysqlroot_pass}" " >> .my.cnf
 # INSTALLING ALL THE LEMP PACKAGE
 
 echo ""
