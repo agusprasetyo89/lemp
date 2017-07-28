@@ -22,7 +22,7 @@ echo -e "${RESET}"
 wget https://raw.githubusercontent.com/pembodohan89/new/master/www.conf
 echo -e "${GREEN}"
 echo "##################################################"
-echo "############## AUTO LAMP INSTALLER ###############"
+echo "############## AUTO LEMP INSTALLER ###############"
 echo "################### Created By ###################"
 echo "################# Agus Prasetyo ##################"
 echo "##################################################"
