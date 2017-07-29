@@ -230,6 +230,10 @@ echo -e "${RED}" "Database $DBNAME Created For User $DBUSER With Password $DBPAS
 fi
 			exit
 			;;
+					esac
+	done
+	exit
+			;;
 			4) exit;;
 		esac
 	done
