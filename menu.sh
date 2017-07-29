@@ -181,6 +181,7 @@ echo "Site Created for $DOMAIN"
 			exit
 			;;
 			3)
+			clear
 			echo "What do you want to do?"
 		echo "   1) Random SQL Pass"
 		echo "   2) Manual SQL Pass"
@@ -223,6 +224,8 @@ echo -e "${RESET}"
 echo -ne "Please type your database user name: "
 read DBUSER
 echo -e "${RESET}"
+echo -ne "Please type your database password: "
+read DBPASS
 if [ -f /root/.my.cnf ]; then
 mysql -u root -e "CREATE DATABASE $DBNAME"
 mysql -u root -e "GRANT ALL PRIVILEGES ON $DBNAME.* TO $DBUSER@localhost IDENTIFIED BY '$DBPASS'"
