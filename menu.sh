@@ -231,7 +231,6 @@ fi
 			exit
 			;;
 					esac
-	done
 	exit
 			;;
 			4) exit;;
