@@ -228,8 +228,6 @@ mysql -u root -e "CREATE DATABASE $DBNAME"
 mysql -u root -e "GRANT ALL PRIVILEGES ON $DBNAME.* TO $DBUSER@localhost IDENTIFIED BY '$DBPASS'"
 echo -e "${RED}" "Database $DBNAME Created For User $DBUSER With Password $DBPASS ${RESET}"
 fi
-exit
-			;;
 			exit
 			;;
 			4) exit;;
