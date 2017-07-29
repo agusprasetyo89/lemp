@@ -186,7 +186,7 @@ echo "Site Created for $DOMAIN"
 		echo "   1) Random SQL Pass"
 		echo "   2) Manual SQL Pass"
 		echo "   3) Exit"
-		read -p "Select an option [1-4]: " option2
+		read -p "Select an option [1-3]: " option2
 		case $option2 in
 		1)
 DBPASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
