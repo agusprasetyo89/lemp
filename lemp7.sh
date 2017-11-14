@@ -1,8 +1,8 @@
 #!/bin/bash
 # NginxID.com command line installer NGINX for CentOS
 yum clean all && yum -y update && yum -y upgrade
-rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+yum -y install epel-release
+wget -O https://raw.githubusercontent.com/pembodohan89/new/master/remi.repo /etc/yum.repos.d/remi.repo
 echo "[nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
@@ -11,8 +11,8 @@ enabled=1" >> /etc/yum.repos.d/nginx.repo
 yum -y --enablerepo=remi install nginx mariadb-server mariadb php php-common php-fpm
 yum -y --enablerepo=remi install php-mysql php-pgsql php-pecl-memcache php-gd php-mbstring php-mcrypt php-xml php-pecl-apcu php-cli php-pear php-pdo
 sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /etc/php.ini
-sed -i 's/user = apache/user = nginx/g' /etc/php-fpm.d/www.conf
-sed -i 's/group = apache/group = nginx/g' /etc/php-fpm.d/www.conf
+sed -i 's/user = apache/user = jobindo/g' /etc/php-fpm.d/www.conf
+sed -i 's/group = apache/group = jobindo/g' /etc/php-fpm.d/www.conf
 systemctl start nginx.service
 systemctl enable nginx.service
 systemctl start mariadb
