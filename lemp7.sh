@@ -1,6 +1,5 @@
 #!/bin/bash
 # NginxID.com command line installer NGINX for CentOS
-#yum clean all && yum -y update && yum -y upgrade
 yum -y install epel-release
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rm -f /etc/yum.repos.d/remi.repo
@@ -12,6 +11,7 @@ gpgcheck=0
 enabled=1" >> /etc/yum.repos.d/nginx.repo
 package_list="nginx mariadb-server mariadb php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
 service_list="nginx php-fpm mariadb postfix denyhosts crond"
+yum clean all && yum -y update && yum -y upgrade
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
 RED="\e[31m"
