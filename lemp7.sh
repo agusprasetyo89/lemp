@@ -2,7 +2,7 @@
 # NginxID.com command line installer NGINX for CentOS
 yum clean all && yum -y update && yum -y upgrade
 yum -y install epel-release
-wget -O https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh /etc/yum.repos.d/remi.repo
+wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
 echo "[nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
