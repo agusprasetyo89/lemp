@@ -1,6 +1,6 @@
 #!/bin/bash
 # NginxID.com command line installer NGINX for CentOS
-yum clean all && yum -y update && yum -y upgrade
+#yum clean all && yum -y update && yum -y upgrade
 yum -y install epel-release
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rm -f /etc/yum.repos.d/remi.repo
