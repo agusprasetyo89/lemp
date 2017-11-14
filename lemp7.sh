@@ -65,6 +65,7 @@ else
 echo -e "${RED} [ FAILED ]${RESET}"
 fi
 done
+systemctl start mariadb
 # INITIAL MYSQL SETUP
 echo ""
 echo -e "${RED}INITIAL MYSQL-SERVER SETUP${RESET}"
