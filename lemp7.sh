@@ -123,4 +123,6 @@ systemctl restart mariadb
 systemctl status nginx
 systemctl status php-fpm
 systemctl status mariadb
+sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
+sestatus
 exit
