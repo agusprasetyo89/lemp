@@ -119,7 +119,6 @@ systemctl start mariadb
 systemctl enable mariadb.service
 systemctl start php-fpm
 systemctl enable php-fpm.service
-mysql_secure_installation
 systemctl restart mariadb
 systemctl status nginx
 systemctl status php-fpm
