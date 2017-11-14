@@ -77,7 +77,7 @@ else
 echo -e "${RED} [ FAILED ]${RESET}"
 fi
 #RESTARTING THE MYSQL TO AVOID ANY ANY ISSUE
-service mysqld restart &> /dev/null
+systemctl restart mariadb &> /dev/null
 #DELETING ANONYMOUS USERS
 printf '=> \e[36m%-038s\e[0m' "Deleting Anonymous Users"
 if mysql -u root -p${mysqlroot_pass} -e "DELETE FROM mysql.user WHERE User=''" &> /dev/null;then
@@ -105,6 +105,7 @@ password="\"${mysqlroot_pass}"\"" >> .my.cnf
 else
 echo ""
 echo -e "${RED}Sorry, passwords do not match.${RESET}"
+fi
 fi
 #yum -y --enablerepo=remi install nginx mariadb-server mariadb php php-common php-fpm
 #yum -y --enablerepo=remi install php-mysql php-pgsql php-pecl-memcache php-gd php-mbstring php-mcrypt php-xml php-pecl-apcu php-cli php-pear php-pdo
