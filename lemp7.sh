@@ -1,11 +1,6 @@
 #!/bin/bash
 # THIS SCRIPT IS WRITTEN BY Agus Prasetyo
 # Email : agus@jobindo.com
-yum -y install epel-release
-rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
-rm -f /etc/yum.repos.d/remi.repo
-wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
-yum clean all && yum -y update && yum -y upgrade
 package_list="nginx mariadb-server mariadb php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
 service_list="nginx php-fpm mariadb postfix denyhosts crond"
 #COLOR CODE TO USE WITH THE ECHO
@@ -23,6 +18,11 @@ echo -e "${RESET}"
 		read -p "Select an option [1-4]: " option
 		case $option in
 			1) 
+yum -y install epel-release
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+rm -f /etc/yum.repos.d/remi.repo
+wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
+yum clean all && yum -y update && yum -y upgrade
 echo -e "${GREEN}"
 echo "##################################################"
 echo "############## AUTO LEMP INSTALLER ###############"
