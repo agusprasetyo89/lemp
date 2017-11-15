@@ -1,22 +1,28 @@
 #!/bin/bash
-# NginxID.com command line installer NGINX for CentOS
+# THIS SCRIPT IS WRITTEN BY Agus Prasetyo
+# Email : agus@jobindo.com
 yum -y install epel-release
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rm -f /etc/yum.repos.d/remi.repo
 wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
-echo "[nginx]
-name=nginx repo
-baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
-gpgcheck=0
-enabled=1" >> /etc/yum.repos.d/nginx.repo
+yum clean all && yum -y update && yum -y upgrade
 package_list="nginx mariadb-server mariadb php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
 service_list="nginx php-fpm mariadb postfix denyhosts crond"
-yum clean all && yum -y update && yum -y upgrade
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
 RED="\e[31m"
 GREEN="\e[32m"
 CYAN="\e[36m"
+#CLEAR THE WHOLE SCREEN
+echo -e "${RESET}"
+		echo "What do you want to do?"
+		echo "   1) Install LEMP"
+		echo "   2) Create NGINX CONFIG"
+		echo "   3) Create DATABASE"
+		echo "   4) Exit"
+		read -p "Select an option [1-4]: " option
+		case $option in
+			1) 
 echo -e "${GREEN}"
 echo "##################################################"
 echo "############## AUTO LEMP INSTALLER ###############"
@@ -126,3 +132,114 @@ systemctl status mariadb
 sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 sestatus
 exit
+			exit
+			;;
+			2)
+wget https://raw.githubusercontent.com/pembodohan89/new/master/virtual_host.template
+wget https://raw.githubusercontent.com/pembodohan89/new/master/index.html.template
+NGINX_CONFIG='/etc/nginx/conf.d'
+WEB_DIR='/home'
+SED=`which sed`
+CURRENT_DIR=`dirname $0`
+echo -e "${GREEN}"
+echo "##################################################"
+echo "############## AUTO NGINX CONFIG ################"
+echo "################### Created By ###################"
+echo "################# Agus Prasetyo ##################"
+echo "##################################################"
+echo -e "${RESET}"
+echo -ne "Please type your domain name: "
+read DOMAIN
+
+# check the domain is roughly valid!
+PATTERN="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,6}$"
+if [[ "$DOMAIN" =~ $PATTERN ]]; then
+	DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+	echo "Creating hosting for:" $DOMAIN
+else
+	echo "invalid domain name"
+	exit 1 
+fi
+
+#Replace dots with underscores
+SITE_DIR=`echo $DOMAIN | $SED 's/\./_/g'`
+
+# Now we need to copy the virtual host template
+CONFIG=$NGINX_CONFIG/$DOMAIN.conf
+cp /root/virtual_host.template $CONFIG
+$SED -i "s/DOMAIN/$DOMAIN/g" $CONFIG
+$SED -i "s!ROOT!$WEB_DIR/$SITE_DIR!g" $CONFIG
+
+# set up web root
+mkdir $WEB_DIR/$SITE_DIR
+
+# reload Nginx to pull in new config
+/etc/init.d/nginx reload
+
+# put the template index.html file into the new domains web dir
+cp /root/index.html.template $WEB_DIR/$SITE_DIR/index.php
+chown nginx:nginx -R $WEB_DIR/$SITE_DIR
+chmod 600 $CONFIG
+chmod -R 755 $WEB_DIR/$SITE_DIR
+echo "Site Created for $DOMAIN"
+			exit
+			;;
+			3)
+			clear
+			echo "What do you want to do?"
+		echo "   1) Random SQL Pass"
+		echo "   2) Manual SQL Pass"
+		echo "   3) Exit"
+		read -p "Select an option [1-3]: " option2
+		case $option2 in
+		1)
+DBPASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+echo -e "${GREEN}"
+echo "##################################################"
+echo "############## AUTO SQL CONFIG ################"
+echo "################### Created By ###################"
+echo "################# Agus Prasetyo ##################"
+echo "##################################################"
+echo -e "${RESET}"
+echo -ne "Please type your database name: "
+read DBNAME
+echo -e "${RESET}"
+echo -ne "Please type your database user name: "
+read DBUSER
+echo -e "${RESET}"
+if [ -f /root/.my.cnf ]; then
+mysql -u root -e "CREATE DATABASE $DBNAME"
+mysql -u root -e "GRANT ALL PRIVILEGES ON $DBNAME.* TO $DBUSER@localhost IDENTIFIED BY '$DBPASS'"
+echo -e "${RED}" "Database $DBNAME Created For User $DBUSER With Password $DBPASS ${RESET}"
+fi
+exit
+			;;
+			2)
+			echo -e "${GREEN}"
+echo "##################################################"
+echo "############## AUTO SQL CONFIG ################"
+echo "################### Created By ###################"
+echo "################# Agus Prasetyo ##################"
+echo "##################################################"
+echo -e "${RESET}"
+echo -ne "Please type your database name: "
+read DBNAME
+echo -e "${RESET}"
+echo -ne "Please type your database user name: "
+read DBUSER
+echo -e "${RESET}"
+echo -ne "Please type your database password: "
+read DBPASS
+if [ -f /root/.my.cnf ]; then
+mysql -u root -e "CREATE DATABASE $DBNAME"
+mysql -u root -e "GRANT ALL PRIVILEGES ON $DBNAME.* TO $DBUSER@localhost IDENTIFIED BY '$DBPASS'"
+echo -e "${RED}" "Database $DBNAME Created For User $DBUSER With Password $DBPASS ${RESET}"
+fi
+			exit
+			;;
+					esac
+	exit
+			;;
+			4) exit;;
+		esac
+	done
