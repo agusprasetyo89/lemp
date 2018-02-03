@@ -4,7 +4,6 @@
 package_list="epel-release nginx mysql mysql-server mysql-devel php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
 service_list="nginx php-fpm mysqld postfix denyhosts crond"
 mysqlroot_pass="mysql123"
-rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
 RED="\e[31m"
