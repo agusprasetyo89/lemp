@@ -4,6 +4,7 @@
 package_list="epel-release nginx mysql mysql-server mysql-devel php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
 service_list="nginx php-fpm mysqld postfix denyhosts crond"
 mysqlroot_pass="mysql123"
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
 RED="\e[31m"
@@ -20,6 +21,7 @@ echo -e "${RESET}"
 		case $option in
 			1) 
 wget https://raw.githubusercontent.com/pembodohan89/new/master/www.conf
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
 echo -e "${GREEN}"
 echo "##################################################"
 echo "############## AUTO LEMP INSTALLER ###############"
@@ -50,7 +52,7 @@ echo -e '```````````````````````'
 for package in ${package_list}
 do
 printf '=> \e[36m%-023s\e[0m\e[30m%-015s\e[0m' "Installing ${package}"
-if yum install -y ${package} &> /dev/null;then
+if yum install --enablerepo=remi,remi-php55 -y ${package} &> /dev/null;then
 echo -e "${GREEN} [ DONE ]${RESET}"
 else
 echo -e "${RED} [ FAILED ]${RESET}"
