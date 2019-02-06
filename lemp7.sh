@@ -1,7 +1,7 @@
 #!/bin/bash
 # THIS SCRIPT IS WRITTEN BY Agus Prasetyo
 # Email : agus@jobindo.com
-package_list="nginx mariadb-server mariadb php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
+package_list="nginx mariadb-server mariadb php php-mysql php-common php-intl php-soap php-gd php-mbstring php-curl php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
 service_list="nginx php-fpm mariadb postfix denyhosts crond"
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
