@@ -1,8 +1,8 @@
 #!/bin/bash
 # THIS SCRIPT IS WRITTEN BY Agus Prasetyo
 # Email : agus@jobindo.com
-package_list="epel-release nginx mysql mysql-server mysql-devel php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
-service_list="nginx php-fpm mysqld postfix denyhosts crond"
+package_list="epel-release nginx mysql mysql-server mysql-devel php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml php-fpm postfix fail2ban cronie rsync cyrus-sasl-plain"
+service_list="nginx php-fpm mysqld postfix fail2ban crond"
 mysqlroot_pass="mysql123"
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
