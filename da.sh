@@ -6,6 +6,8 @@ clear
 		echo "   1) Install Direct Admin"
 		echo "   2) Install Let's Encrypt"
   		echo "   3) Install Hostname SSL"
+		read -p "Select an option [1-3]: " option
+		case $option in
     case $option in
 			1) 
 service firewalld stop;
@@ -14,6 +16,7 @@ yum install wget gcc gcc-c++ flex bison make bind bind-libs bind-utils openssl o
 wget https://www.directadmin.com/setup.sh;
 bash setup.sh;
 exit
+			;;
 			
       2)
             echo 'letsencrypt=1'>>/usr/local/directadmin/conf/directadmin.conf;
@@ -24,12 +27,15 @@ exit
             ./build update;
             ./build letsencrypt;
             service directadmin restart;
-      exit
+exit
+			;;
 			
       3)
 
 echo -ne "Please type your hostname: "
 read HOSTNAME
 cd /usr/local/directadmin/scripts;./letsencrypt.sh request_single $HOSTNAME 4096;cd /usr/local/directadmin/conf;perl -pi -e 's/SSL=0/SSL=1/' directadmin.conf;echo "carootcert=/usr/local/directadmin/conf/carootcert.pem" >> directadmin.conf;echo "force_hostname=$HOSTNAME" >> directadmin.conf;echo "ssl_redirect_host=$HOSTNAME" >> directadmin.conf;service directadmin restart;
-   exit
+exit;;
+		esac
+	done
 			
