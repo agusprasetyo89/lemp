@@ -1,6 +1,7 @@
 #!/bin/bash
 # THIS SCRIPT IS WRITTEN BY Agus Prasetyo
 # Email : agus@jobindo.com
+clear
 		echo "What do you want to do?"
 		echo "   1) Install Direct Admin"
 		echo "   2) Install Let's Encrypt"
