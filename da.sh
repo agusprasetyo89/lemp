@@ -7,7 +7,6 @@ clear
 		echo "   2) Install Let's Encrypt"
   		echo "   3) Install Hostname SSL"
 		read -p "Select an option [1-3]: " option
-		case $option in
     case $option in
 			1) 
 service firewalld stop;
