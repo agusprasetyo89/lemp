@@ -174,7 +174,7 @@ $SED -i "s!ROOT!$WEB_DIR/$SITE_DIR!g" $CONFIG
 mkdir $WEB_DIR/$SITE_DIR
 
 # reload Nginx to pull in new config
-/etc/init.d/nginx reload
+systemctl restart nginx
 
 # put the template index.html file into the new domains web dir
 cp /root/index.html.template $WEB_DIR/$SITE_DIR/index.php
