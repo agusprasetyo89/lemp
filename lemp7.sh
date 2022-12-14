@@ -1,8 +1,8 @@
 #!/bin/bash
 # THIS SCRIPT IS WRITTEN BY Agus Prasetyo
 # Email : agus@jobindo.com
-package_list="nginx mariadb-server mariadb php php-mysql php-common php-zip php-intl php-soap php-gd php-mbstring php-curl php-mcrypt php-devel php-xml php-fpm postfix denyhosts cronie rsync cyrus-sasl-plain"
-service_list="nginx php-fpm mariadb postfix denyhosts crond"
+package_list="yum-utils nginx mariadb-server mariadb php php-mysql php-common php-opcache php-zip php-intl php-soap php-gd php-xmlrpc php-mbstring php-curl php-mcrypt php-devel php-xml php-fpm postfix fail2ban cronie rsync cyrus-sasl-plain"
+service_list="nginx php-fpm mariadb postfix fail2ban crond"
 #COLOR CODE TO USE WITH THE ECHO
 RESET="\e[0m"
 RED="\e[31m"
@@ -22,6 +22,7 @@ yum -y install epel-release
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rm -f /etc/yum.repos.d/remi.repo
 wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
+yum-config-manager --enable remi-php74
 yum clean all && yum -y update && yum -y upgrade
 echo -e "${GREEN}"
 echo "##################################################"
