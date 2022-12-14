@@ -22,6 +22,7 @@ yum -y install epel-release
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rm -f /etc/yum.repos.d/remi.repo
 wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
+wget https://raw.githubusercontent.com/pembodohan89/new/master/mariadb.repo -O /etc/yum.repos.d/mariadb.repo
 yum -y install yum-utils
 yum-config-manager --enable remi-php74
 yum clean all && yum -y update && yum -y upgrade
