@@ -12,22 +12,12 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
 
 [remi-php55]
-name=Remi's PHP 5.5 RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/php55/$basearch/
-#mirrorlist=https://rpms.remirepo.net/enterprise/7/php55/httpsmirror
-mirrorlist=http://rpms.remirepo.net/enterprise/7/php55/mirror
+name=Remi's PHP 8.1 RPM repository for Enterprise Linux 7 - $basearch
+#baseurl=http://rpms.remirepo.net/enterprise/7/php81/$basearch/
+#mirrorlist=https://rpms.remirepo.net/enterprise/7/php81/httpsmirror
+mirrorlist=http://rpms.remirepo.net/enterprise/7/php81/mirror
 # NOTICE: common dependencies are in "remi-safe"
 enabled=1
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-php56]
-name=Remi's PHP 5.6 RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/php56/$basearch/
-#mirrorlist=https://rpms.remirepo.net/enterprise/7/php56/httpsmirror
-mirrorlist=http://rpms.remirepo.net/enterprise/7/php56/mirror
-# NOTICE: common dependencies are in "remi-safe"
-enabled=0
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
 
@@ -44,20 +34,6 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
 [remi-debuginfo]
 name=Remi's RPM repository for Enterprise Linux 7 - $basearch - debuginfo
 baseurl=http://rpms.remirepo.net/enterprise/7/debug-remi/$basearch/
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-php55-debuginfo]
-name=Remi's PHP 5.5 RPM repository for Enterprise Linux 7 - $basearch - debuginfo
-baseurl=http://rpms.remirepo.net/enterprise/7/debug-php55/$basearch/
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-php56-debuginfo]
-name=Remi's PHP 5.6 RPM repository for Enterprise Linux 7 - $basearch - debuginfo
-baseurl=http://rpms.remirepo.net/enterprise/7/debug-php56/$basearch/
 enabled=0
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
