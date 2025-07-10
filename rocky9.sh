@@ -24,7 +24,7 @@ rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-9.5.rpm
 #wget https://raw.githubusercontent.com/pembodohan89/new/master/remi.sh -O /etc/yum.repos.d/remi.repo
 #wget https://raw.githubusercontent.com/pembodohan89/new/master/mariadb.repo -O /etc/yum.repos.d/mariadb.repo
 yum -y install yum-utils
-dnf module enable php:remi-7.4
+dnf module enable php:remi-8.3
 #yum-config-manager --enable remi-php74
 yum clean all && yum -y update && yum -y upgrade
 echo -e "${GREEN}"
