@@ -65,13 +65,30 @@ EOF
 function list_proxies() {
     echo -e "\n${CYAN}List of proxied domains:${RESET}"
     files=(${NGINX_CONF_PATH}/*.conf)
+    domains=()
     i=1
     for file in "${files[@]}"; do
         domain=$(grep -i 'server_name' "$file" | head -1 | awk '{print $2}' | sed 's/;//')
         target=$(grep -i 'proxy_pass' "$file" | head -1 | awk '{print $2}' | sed 's/;//')
         printf "%2d. %-25s → %s\n" "$i" "$domain" "$target"
+        domains+=("$domain")
         ((i++))
     done
+
+    echo -e "\nPilih opsi:"
+    echo "1) Hapus domain"
+    echo "2) Kembali ke menu utama"
+    read -p "Pilihan [1-2]: " action
+    if [ "$action" = "1" ]; then
+        read -p "Masukkan nomor domain yang akan dihapus: " num
+        DOMAIN=${domains[$((num-1))]}
+        rm -f "${NGINX_CONF_PATH}/${DOMAIN}.conf"
+        rm -f "${NGINX_ENABLED_PATH}/${DOMAIN}.conf"
+        rm -rf "/var/www/${DOMAIN}"
+        certbot delete --cert-name "$DOMAIN" -n || true
+        systemctl reload nginx
+        echo -e "${GREEN}Domain $DOMAIN dihapus.${RESET}"
+    fi
 }
 
 function remove_proxy() {
@@ -94,12 +111,28 @@ while true; do
     echo "2) Create new reverse proxy for domain"
     echo "3) List current proxied domains"
     echo "4) Remove proxy by domain"
-    echo "5) Exit"
-echo "6) Buat Port Forwarding (iptables NAT)"
+    echo "6) Buat Port Forwarding (iptables NAT)"
+echo "7) Lihat Semua Port Forwarding Aktif"
+echo "8) Exit"
     read -p "Choose an option [1-5]: " CHOICE
 
     case $CHOICE in
         1) install_nginx ;;
+7)
+  echo -e "\n${CYAN}Daftar Port Forwarding NAT Aktif:${RESET}"
+  iptables -t nat -L PREROUTING -n -v --line-numbers | grep -E "DNAT"
+  echo -e "\nPilih opsi:"
+  echo "1) Hapus rule berdasarkan nomor baris"
+  echo "2) Kembali ke menu utama"
+  read -p "Pilihan [1-2]: " ans
+  if [ "$ans" = "1" ]; then
+    read -p "Masukkan nomor baris yang akan dihapus: " lineno
+    iptables -t nat -D PREROUTING $lineno
+    echo -e "${GREEN}Rule baris $lineno dihapus.${RESET}"
+    iptables-save > /etc/iptables/rules.v4
+  fi
+  ;;
+
         2) create_proxy ;;
         3) list_proxies ;;
         4) remove_proxy ;;
@@ -144,3 +177,5 @@ echo "6) Buat Port Forwarding (iptables NAT)"
         *) echo -e "${RED}Invalid option${RESET}" ;;
     esac
 done
+
+8) exit 0 ;;
