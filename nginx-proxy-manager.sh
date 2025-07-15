@@ -107,10 +107,23 @@ echo "6) Buat Port Forwarding (iptables NAT)"
 
 6)
   echo -e "${CYAN}Setup Port Forwarding (iptables NAT):${RESET}"
-  read -p "Port publik di host (misal: 8080): " PUBPORT
-  read -p "IP internal tujuan (misal: 192.168.19.101): " INTIP
-  read -p "Port tujuan di internal (misal: 80): " INTPORT
+  read -p "IP internal tujuan (misal: 192.168.2.100): " INTIP
+  read -p "Port tujuan di internal (misal: 22): " INTPORT
   read -p "Protocol [tcp/udp]: " PROTO
+
+  # Saran port publik otomatis
+  LAST_OCTET=$(echo $INTIP | awk -F'.' '{print $4}')
+  if [ "$INTPORT" = "22" ]; then
+    PUBPORT="10${LAST_OCTET}22"
+  else
+    PUBPORT="1${LAST_OCTET}${INTPORT}"
+  fi
+
+  echo -e "${CYAN}Port publik yang disarankan: ${GREEN}$PUBPORT${RESET}"
+  read -p "Gunakan port publik ini? [Y/n]: " confirm
+  if [[ "$confirm" =~ ^[Nn]$ ]]; then
+    read -p "Masukkan port publik manual: " PUBPORT
+  fi
 
   iptables -t nat -A PREROUTING -p $PROTO --dport $PUBPORT -j DNAT --to-destination $INTIP:$INTPORT
   iptables -t nat -A POSTROUTING -p $PROTO -d $INTIP --dport $INTPORT -j MASQUERADE
