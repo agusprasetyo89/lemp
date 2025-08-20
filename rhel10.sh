@@ -136,8 +136,8 @@ exit
 			exit
 			;;
 			2)
-wget https://raw.githubusercontent.com/pembodohan89/new/master/virtual_host.template
-wget https://raw.githubusercontent.com/pembodohan89/new/master/index.html.template
+wget https://raw.githubusercontent.com/agusprasetyo89/new/master/virtual_host.template
+wget https://raw.githubusercontent.com/agusprasetyo89/new/master/index.html.template
 NGINX_CONFIG='/etc/nginx/conf.d'
 WEB_DIR='/home'
 SED=`which sed`
