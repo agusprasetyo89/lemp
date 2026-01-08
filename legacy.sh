@@ -10,8 +10,8 @@ echo " PHP 5.6 (Docker) + Nginx Installer"
 echo "========================================="
 echo ""
 
-read -p "Masukkan DOMAIN (contoh: legacy.jobindo.com): " DOMAIN
-read -p "Masukkan WEB ROOT (contoh: /home/jobindo/www): " WEB_ROOT
+read -p "Masukkan DOMAIN (contoh: legacy.domain.com): " DOMAIN
+read -p "Masukkan WEB ROOT (contoh: /home/domain/www): " WEB_ROOT
 
 if [[ -z "$DOMAIN" || -z "$WEB_ROOT" ]]; then
     echo "[ERROR] Domain dan Web Root tidak boleh kosong"
