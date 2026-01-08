@@ -10,9 +10,8 @@ echo " PHP 5.6 (Docker) + Nginx Installer"
 echo "========================================="
 echo ""
 
-# ===== INPUT USER =====
-read -p "Masukkan DOMAIN (contoh: legacy.domain.com): " DOMAIN
-read -p "Masukkan WEB ROOT (contoh: /home/domain/www): " WEB_ROOT
+read -p "Masukkan DOMAIN (contoh: legacy.jobindo.com): " DOMAIN
+read -p "Masukkan WEB ROOT (contoh: /home/jobindo/www): " WEB_ROOT
 
 if [[ -z "$DOMAIN" || -z "$WEB_ROOT" ]]; then
     echo "[ERROR] Domain dan Web Root tidak boleh kosong"
@@ -29,22 +28,28 @@ echo "[INFO] Domain   : ${DOMAIN}"
 echo "[INFO] Web Root : ${WEB_ROOT}"
 echo ""
 
-# ===== INSTALL DOCKER =====
+# ================= DOCKER =================
 if ! command -v docker &>/dev/null; then
     echo "[+] Installing Docker..."
-    dnf install -y docker docker-compose-plugin
+    dnf install -y docker
     systemctl enable --now docker
 else
     echo "[✓] Docker already installed"
 fi
 
-# ===== PREPARE DIRECTORIES =====
-echo "[+] Preparing directories..."
-mkdir -p "${PHP56_DIR}"
-mkdir -p "${WEB_ROOT}"
-mkdir -p "${SOCKET_DIR}"
+# docker-compose fallback
+if ! command -v docker-compose &>/dev/null; then
+    echo "[+] Installing docker-compose (legacy)..."
+    dnf install -y docker-compose
+else
+    echo "[✓] docker-compose available"
+fi
 
-# ===== PHP.INI =====
+# ================= DIR =================
+echo "[+] Preparing directories..."
+mkdir -p "${PHP56_DIR}" "${WEB_ROOT}" "${SOCKET_DIR}"
+
+# ================= PHP.INI =================
 echo "[+] Creating php.ini..."
 cat > "${PHP56_DIR}/php.ini" <<'EOF'
 cgi.fix_pathinfo=0
@@ -69,34 +74,44 @@ date.timezone=Asia/Jakarta
 disable_functions=exec,passthru,shell_exec,system,proc_open,popen
 EOF
 
-# ===== DOCKER COMPOSE =====
+# ================= DOCKER COMPOSE =================
 echo "[+] Creating docker-compose.yml..."
 cat > "${PHP56_DIR}/docker-compose.yml" <<EOF
-version: "3.8"
+version: "3"
 
 services:
   php56:
     image: php:5.6-fpm
-    container_name: php56-fpm-${DOMAIN}
+    container_name: php56-${DOMAIN}
     restart: always
     volumes:
       - ${WEB_ROOT}:/var/www/html
       - ${PHP56_DIR}/php.ini:/usr/local/etc/php/php.ini
       - ${SOCKET_DIR}:${SOCKET_DIR}
-    command: php-fpm -y /usr/local/etc/php-fpm.conf -R
+    command: php-fpm -R
 EOF
 
-# ===== START CONTAINER =====
+# ================= START CONTAINER =================
 echo "[+] Starting PHP 5.6 container..."
 cd "${PHP56_DIR}"
-docker compose up -d
+docker-compose up -d
 
-# ===== PERMISSION =====
-echo "[+] Fixing permissions..."
+# ================= PERMISSION =================
 chown -R nginx:nginx "${WEB_ROOT}"
 chmod -R 755 "${WEB_ROOT}"
 
-# ===== NGINX CONFIG =====
+# ================= INDEX.PHP =================
+if [ ! -f "${WEB_ROOT}/index.php" ]; then
+    echo "[+] Creating index.php..."
+    cat > "${WEB_ROOT}/index.php" <<'EOF'
+<?php
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+echo "Selamat datang, IP anda adalah " . $ip;
+?>
+EOF
+fi
+
+# ================= NGINX CONFIG =================
 echo "[+] Creating Nginx config..."
 cat > "${NGINX_CONF}" <<EOF
 server {
@@ -125,19 +140,14 @@ server {
 }
 EOF
 
-# ===== TEST & RELOAD NGINX =====
-echo "[+] Testing Nginx configuration..."
+# ================= RELOAD NGINX =================
 nginx -t
-
-echo "[+] Reloading Nginx..."
 systemctl reload nginx
 
-# ===== DONE =====
 echo ""
 echo "========================================="
-echo " PHP 5.6 SETUP SELESAI"
+echo " PHP 5.6 + Nginx SELESAI"
 echo " Domain   : ${DOMAIN}"
 echo " Web Root : ${WEB_ROOT}"
 echo " FastCGI  : unix:${SOCKET_FILE}"
-echo " Nginx    : ${NGINX_CONF}"
 echo "========================================="
