@@ -1,5 +1,5 @@
 #!/bin/bash
-# PHP 5.6 Docker + Nginx Interactive Installer
+# PHP 5.6 Docker + Nginx Installer (STABLE VERSION)
 # Author : Agus Prasetyo
 # Target : AlmaLinux 9 + LEMP existing
 
@@ -28,90 +28,79 @@ echo "[INFO] Domain   : ${DOMAIN}"
 echo "[INFO] Web Root : ${WEB_ROOT}"
 echo ""
 
-# ================= DOCKER =================
-if ! command -v docker &>/dev/null; then
-    echo "[+] Installing Docker..."
-    dnf install -y docker
+# =================================================
+# INSTALL DOCKER ENGINE (RESMI)
+# =================================================
+if ! systemctl list-unit-files | grep -q docker.service; then
+    echo "[+] Installing Docker Engine..."
+
+    dnf remove -y docker docker-client docker-common docker-latest docker-engine >/dev/null 2>&1 || true
+
+    dnf install -y dnf-plugins-core
+    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
     systemctl enable --now docker
 else
-    echo "[✓] Docker already installed"
+    echo "[✓] Docker Engine already installed"
 fi
 
-# docker-compose fallback
-if ! command -v docker-compose &>/dev/null; then
-    echo "[+] Installing docker-compose (legacy)..."
-    dnf install -y docker-compose
-else
-    echo "[✓] docker-compose available"
-fi
-
-# ================= DIR =================
+# =================================================
+# PREPARE DIRECTORIES
+# =================================================
 echo "[+] Preparing directories..."
 mkdir -p "${PHP56_DIR}" "${WEB_ROOT}" "${SOCKET_DIR}"
 
-# ================= PHP.INI =================
-echo "[+] Creating php.ini..."
-cat > "${PHP56_DIR}/php.ini" <<'EOF'
-cgi.fix_pathinfo=0
-
-extension=mysqli
-extension=pdo_mysql
-extension=mbstring
-extension=soap
-extension=zip
-extension=intl
-extension=xmlrpc
-extension=gd
-extension=curl
-extension=opcache
-
-memory_limit=256M
-upload_max_filesize=64M
-post_max_size=64M
-max_execution_time=60
-date.timezone=Asia/Jakarta
-
-disable_functions=exec,passthru,shell_exec,system,proc_open,popen
-EOF
-
-# ================= DOCKER COMPOSE =================
+# =================================================
+# DOCKER COMPOSE (PHP 5.6 LEGACY IMAGE)
+# =================================================
 echo "[+] Creating docker-compose.yml..."
 cat > "${PHP56_DIR}/docker-compose.yml" <<EOF
-version: "3"
-
 services:
   php56:
-    image: php:5.6-fpm
+    image: webdevops/php:5.6
     container_name: php56-${DOMAIN}
     restart: always
     volumes:
-      - ${WEB_ROOT}:/var/www/html
-      - ${PHP56_DIR}/php.ini:/usr/local/etc/php/php.ini
+      - ${WEB_ROOT}:/app
       - ${SOCKET_DIR}:${SOCKET_DIR}
-    command: php-fpm -R
+    environment:
+      PHP_FPM_LISTEN: ${SOCKET_FILE}
+      PHP_MEMORY_LIMIT: 256M
+      PHP_UPLOAD_MAX_FILESIZE: 64M
+      PHP_POST_MAX_SIZE: 64M
+      PHP_DATE_TIMEZONE: Asia/Jakarta
 EOF
 
-# ================= START CONTAINER =================
+# =================================================
+# START CONTAINER
+# =================================================
 echo "[+] Starting PHP 5.6 container..."
 cd "${PHP56_DIR}"
-docker-compose up -d
+docker compose up -d
 
-# ================= PERMISSION =================
+# =================================================
+# PERMISSION
+# =================================================
 chown -R nginx:nginx "${WEB_ROOT}"
 chmod -R 755 "${WEB_ROOT}"
 
-# ================= INDEX.PHP =================
+# =================================================
+# INDEX.PHP DEFAULT
+# =================================================
 if [ ! -f "${WEB_ROOT}/index.php" ]; then
     echo "[+] Creating index.php..."
     cat > "${WEB_ROOT}/index.php" <<'EOF'
 <?php
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
-echo "Selamat datang, IP anda adalah " . $ip;
+echo "Selamat datang, IP anda adalah " . htmlspecialchars($ip);
 ?>
 EOF
 fi
 
-# ================= NGINX CONFIG =================
+# =================================================
+# NGINX CONFIG
+# =================================================
 echo "[+] Creating Nginx config..."
 cat > "${NGINX_CONF}" <<EOF
 server {
@@ -140,14 +129,17 @@ server {
 }
 EOF
 
-# ================= RELOAD NGINX =================
+# =================================================
+# TEST & RELOAD NGINX
+# =================================================
 nginx -t
 systemctl reload nginx
 
 echo ""
 echo "========================================="
-echo " PHP 5.6 + Nginx SELESAI"
+echo " PHP 5.6 LEGACY SETUP SELESAI & AMAN"
 echo " Domain   : ${DOMAIN}"
 echo " Web Root : ${WEB_ROOT}"
 echo " FastCGI  : unix:${SOCKET_FILE}"
+echo " AutoRun  : ENABLED (after reboot)"
 echo "========================================="
