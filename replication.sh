@@ -94,7 +94,7 @@ EOF
   cat > "$MASTER_STATUS" <<EOF
 MASTER_LOG_FILE=$MASTER_LOG_FILE
 MASTER_LOG_POS=$MASTER_LOG_POS
-CREATED_AT=$(date '+%F %T')
+CREATED_AT="$(date '+%F %T')"
 EOF
 
   echo
@@ -138,10 +138,7 @@ master_dump_and_trigger() {
 
   echo "[MASTER] Trigger SLAVE via screen ($SESSION)..."
   ssh -p "$SLAVE_SSH_PORT" "$SLAVE_SSH_USER@$SLAVE_IP" <<EOF
-screen -dmS $SESSION bash -c '
-cd $WORKDIR &&
-./replication-tool.sh --slave >> $LOGDIR/import-$TS.log 2>&1
-'
+screen -dmS $SESSION bash -c 'cd $WORKDIR && ./replication-tool.sh --slave >> $LOGDIR/import-$TS.log 2>&1'
 EOF
 
   echo
@@ -169,12 +166,13 @@ slave_import() {
   echo "[SLAVE] Stop replication..."
   mysql -e "STOP SLAVE; RESET SLAVE;"
 
-  BACKUP_DB="${DB_NAME}_backup_$(date +%s)"
-  mysql -e "RENAME DATABASE \`$DB_NAME\` TO \`$BACKUP_DB\`;" 2>/dev/null || true
+  echo "[SLAVE] Drop database lama jika ada..."
+  mysql -e "DROP DATABASE IF EXISTS \`$DB_NAME\`;"
+
+  echo "[SLAVE] Create database baru..."
   mysql -e "CREATE DATABASE \`$DB_NAME\` DEFAULT CHARACTER SET utf8mb4;"
 
   echo "[SLAVE] Import database (progress jika pv tersedia)..."
-
   if command -v pv >/dev/null 2>&1; then
     pv "$LATEST_DUMP" | gunzip | mysql
   else
@@ -207,50 +205,35 @@ show_documentation() {
  DOKUMENTASI - MariaDB Replication Tool (1 File)
 ====================================================
 
-⚠️ WAJIB:
+WAJIB:
 ----------------------------------------------------
-SEBELUM MODE APAPUN,
-JALANKAN:
+JALANKAN INIT TERLEBIH DAHULU
 
   1) INIT : Dokumentasi & setup config
-
-Tanpa INIT, semua mode lain akan GAGAL.
 
 
 STRUKTUR DIRECTORY
 ----------------------------------------------------
 /home/repl-job/
- ├─ config.env        → konfigurasi IP, port, db
- ├─ master.status     → binlog position master
- ├─ dumps/            → file dump database
- ├─ logs/             → log import slave
+ ├─ config.env
+ ├─ master.status
+ ├─ dumps/
+ ├─ logs/
  └─ replication-tool.sh
 
 
 CARA PAKAI (REAL LIFE)
 ----------------------------------------------------
-1️⃣ INIT (sekali saja)
-   ./replication-tool.sh
-   pilih: 1
-
-2️⃣ DUMP & TRIGGER (di MASTER)
-   ./replication-tool.sh
-   pilih: 2
-
-3️⃣ MONITORING (opsional, di SLAVE)
-   screen -ls
-   screen -r repl_import_xxx
-   tail -f /home/repl-job/logs/import-*.log
-
-4️⃣ CEK REPLIKASI (di SLAVE)
-   mysql -e "SHOW SLAVE STATUS\G"
+1) INIT (sekali)
+2) MASTER dump + trigger
+3) SLAVE import via screen
+4) Cek SHOW SLAVE STATUS
 
 
-ATURAN KEAMANAN
+ATURAN
 ----------------------------------------------------
 ✔ MASTER tidak import
 ✔ SLAVE tidak dump
-✔ Import via screen
 ✔ SSH putus aman
 ✔ Ada progress bar (pv)
 
