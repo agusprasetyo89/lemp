@@ -1,11 +1,11 @@
 #!/bin/bash
-# AUTO LEMP INSTALLER - Laravel 12 Ready
-# Created By Agus Prasetyo (Modified)
+# AUTO LEMP INSTALLER - Laravel Ready
+# Created By Agus Prasetyo (Updated)
 
 package_list="nginx mariadb-server mariadb \
 php php-cli php-common php-opcache php-zip php-intl php-soap \
 php-gd php-mbstring php-curl php-bcmath php-xml php-fpm php-mysqlnd \
-postfix fail2ban cronie rsync cyrus-sasl-plain unzip git composer"
+postfix fail2ban cronie rsync cyrus-sasl-plain unzip git composer certbot python3-certbot-nginx"
 
 service_list="nginx php-fpm mariadb postfix fail2ban crond"
 
@@ -16,10 +16,16 @@ CYAN="\e[36m"
 
 echo "What do you want to do?"
 echo "   1) Install LEMP"
-echo "   2) Exit"
-read -p "Select an option [1-2]: " option
+echo "   2) Add Domain (Laravel)"
+echo "   3) Create Database"
+echo "   4) Exit"
+read -p "Select an option [1-4]: " option
 
 case $option in
+
+##################################################
+# INSTALL LEMP
+##################################################
 1)
 
 dnf -y install epel-release
@@ -28,45 +34,22 @@ dnf module reset php -y
 dnf module enable php:remi-8.3 -y
 dnf -y update
 
-echo -ne "Please type your Mysql root password: "
-read -s NEWPASSWD
-echo ""
-echo -ne "Please Re-type your password: "
-read -s CONFIRMPASSWD
+echo -ne "Mysql root password: "
+read -s mysqlroot_pass
 echo ""
 
-if [[ -z ${NEWPASSWD} || -z ${CONFIRMPASSWD} ]]; then
-    echo -e "${RED}Password cannot be empty.${RESET}"
-    exit 1
-fi
-
-if [[ ${NEWPASSWD} != ${CONFIRMPASSWD} ]]; then
-    echo -e "${RED}Passwords do not match.${RESET}"
-    exit 1
-fi
-
-mysqlroot_pass=${CONFIRMPASSWD}
-
-echo -e "${CYAN}Installing Packages...${RESET}"
 for package in ${package_list}
 do
-    printf '=> Installing %-20s' "${package}"
-    if dnf install -y ${package} &> /dev/null; then
-        echo -e "${GREEN} [DONE]${RESET}"
-    else
-        echo -e "${RED} [FAILED]${RESET}"
-    fi
+    dnf install -y ${package} &> /dev/null
 done
 
-echo -e "${CYAN}Enabling Services...${RESET}"
 for service in ${service_list}
 do
-    systemctl enable ${service} &> /dev/null
+    systemctl enable ${service}
 done
 
 systemctl start mariadb
 
-echo -e "${CYAN}Securing MariaDB...${RESET}"
 mysql -u root <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${mysqlroot_pass}';
 DELETE FROM mysql.user WHERE User='';
@@ -80,7 +63,7 @@ user=root
 password=\"${mysqlroot_pass}\"" > /root/.my.cnf
 chmod 600 /root/.my.cnf
 
-echo -e "${CYAN}Optimizing PHP...${RESET}"
+# PHP tuning
 sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /etc/php.ini
 sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /etc/php.ini
@@ -90,25 +73,90 @@ sed -i 's/max_execution_time = 30/max_execution_time = 120/g' /etc/php.ini
 sed -i 's/user = apache/user = nginx/g' /etc/php-fpm.d/www.conf
 sed -i 's/group = apache/group = nginx/g' /etc/php-fpm.d/www.conf
 
-systemctl start nginx
-systemctl start php-fpm
-systemctl start postfix
-systemctl start fail2ban
-systemctl start crond
+systemctl restart nginx
+systemctl restart php-fpm
 
 firewall-cmd --permanent --add-service=http
 firewall-cmd --permanent --add-service=https
 firewall-cmd --reload
 
-echo -e "${RED}Disabling SELinux (as requested)...${RESET}"
+# Disable SELinux
 setenforce 0
 sed -i 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
 
-echo -e "${GREEN}LEMP + PHP 8.3 Installation Completed!${RESET}"
+echo -e "${GREEN}LEMP Installed Successfully${RESET}"
 ;;
 
+##################################################
+# ADD DOMAIN (Laravel Ready)
+##################################################
 2)
-exit
+
+read -p "Enter Domain (example.com): " DOMAIN
+DOMAIN=$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')
+
+WEB_DIR="/home/$DOMAIN"
+WWW_DIR="$WEB_DIR/www"
+CONFIG="/etc/nginx/conf.d/$DOMAIN.conf"
+
+mkdir -p $WWW_DIR/public
+mkdir -p $WWW_DIR/storage
+mkdir -p $WWW_DIR/bootstrap/cache
+
+cat > $CONFIG <<EOF
+server {
+    listen 80;
+    server_name $DOMAIN www.$DOMAIN;
+
+    root $WWW_DIR/public;
+    index index.php index.html;
+
+    access_log /var/log/nginx/$DOMAIN.access.log;
+    error_log  /var/log/nginx/$DOMAIN.error.log;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php-fpm/www.sock;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+EOF
+
+chown -R nginx:nginx $WEB_DIR
+chmod -R 755 $WEB_DIR
+
+systemctl restart nginx
+
+echo -e "${GREEN}Domain Added Successfully${RESET}"
+echo "Laravel root: $WWW_DIR"
 ;;
+
+##################################################
+# CREATE DATABASE
+##################################################
+3)
+
+read -p "Database Name: " DBNAME
+read -p "Database User: " DBUSER
+read -p "Database Password: " DBPASS
+
+mysql -u root <<EOF
+CREATE DATABASE ${DBNAME};
+GRANT ALL PRIVILEGES ON ${DBNAME}.* TO '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASS}';
+FLUSH PRIVILEGES;
+EOF
+
+echo -e "${GREEN}Database Created${RESET}"
+;;
+
+4) exit ;;
 
 esac
