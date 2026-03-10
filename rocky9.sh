@@ -5,7 +5,8 @@
 package_list="nginx mariadb-server mariadb \
 php php-cli php-common php-opcache php-zip php-intl php-soap \
 php-gd php-mbstring php-curl php-bcmath php-xml php-fpm php-mysqlnd \
-postfix fail2ban cronie rsync cyrus-sasl-plain unzip git composer certbot python3-certbot-nginx redis php-pecl-redis"
+postfix fail2ban cronie rsync cyrus-sasl-plain unzip git composer \
+certbot python3-certbot-nginx redis php-pecl-redis"
 
 service_list="nginx php-fpm mariadb postfix fail2ban crond redis"
 
@@ -14,6 +15,7 @@ RED="\e[31m"
 GREEN="\e[32m"
 CYAN="\e[36m"
 
+echo -e "${RESET}"
 echo "What do you want to do?"
 echo "   1) Install LEMP"
 echo "   2) Add Domain (Laravel)"
@@ -30,25 +32,51 @@ case $option in
 
 dnf -y install epel-release
 dnf -y install https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+
 dnf module reset php -y
 dnf module enable php:remi-8.3 -y
+
 dnf -y update
 
 echo -ne "Mysql root password: "
 read -s mysqlroot_pass
 echo ""
 
+echo ""
+echo -e "${RED}INSTALLING LEMP PACKAGES${RESET}"
+echo "--------------------------------"
+
 for package in ${package_list}
 do
-    dnf install -y ${package} &> /dev/null
+printf '=> \e[36m%-30s\e[0m' "Installing ${package}"
+
+if dnf install -y ${package} &> /dev/null; then
+    echo -e "${GREEN}[ DONE ]${RESET}"
+else
+    echo -e "${RED}[ FAILED ]${RESET}"
+fi
 done
+
+echo ""
+echo -e "${RED}ENABLING SERVICES${RESET}"
+echo "--------------------------------"
 
 for service in ${service_list}
 do
-    systemctl enable ${service}
+printf '=> \e[36m%-30s\e[0m' "Starting ${service}"
+
+if systemctl enable --now ${service} &> /dev/null; then
+    echo -e "${GREEN}[ DONE ]${RESET}"
+else
+    echo -e "${RED}[ FAILED ]${RESET}"
+fi
 done
 
 systemctl start mariadb
+
+echo ""
+echo -e "${RED}CONFIGURING MARIADB${RESET}"
+echo "--------------------------------"
 
 mysql -u root <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${mysqlroot_pass}';
@@ -61,9 +89,15 @@ EOF
 echo "[client]
 user=root
 password=\"${mysqlroot_pass}\"" > /root/.my.cnf
+
 chmod 600 /root/.my.cnf
 
-# PHP tuning
+echo -e "${GREEN}MariaDB secured${RESET}"
+
+echo ""
+echo -e "${RED}PHP TUNING${RESET}"
+echo "--------------------------------"
+
 sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /etc/php.ini
 sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /etc/php.ini
@@ -73,26 +107,42 @@ sed -i 's/max_execution_time = 30/max_execution_time = 120/g' /etc/php.ini
 sed -i 's/user = apache/user = nginx/g' /etc/php-fpm.d/www.conf
 sed -i 's/group = apache/group = nginx/g' /etc/php-fpm.d/www.conf
 
-systemctl restart nginx
 systemctl restart php-fpm
+systemctl restart nginx
 
-firewall-cmd --permanent --add-service=http
-firewall-cmd --permanent --add-service=https
-firewall-cmd --reload
+echo -e "${GREEN}PHP optimized for Laravel${RESET}"
 
-# Disable SELinux
-setenforce 0
+echo ""
+echo -e "${RED}CONFIGURING FIREWALL${RESET}"
+echo "--------------------------------"
+
+firewall-cmd --permanent --add-service=http &> /dev/null
+firewall-cmd --permanent --add-service=https &> /dev/null
+firewall-cmd --reload &> /dev/null
+
+echo -e "${GREEN}Firewall configured${RESET}"
+
+echo ""
+echo -e "${RED}DISABLING SELINUX${RESET}"
+echo "--------------------------------"
+
+setenforce 0 &> /dev/null
 sed -i 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
 
+echo -e "${GREEN}SELinux disabled${RESET}"
+
+echo ""
 echo -e "${GREEN}LEMP Installed Successfully${RESET}"
+
 ;;
 
 ##################################################
-# ADD DOMAIN (Laravel Ready)
+# ADD DOMAIN
 ##################################################
 2)
 
 read -p "Enter Domain (example.com): " DOMAIN
+
 DOMAIN=$(echo $DOMAIN | tr '[:upper:]' '[:lower:]')
 
 WEB_DIR="/home/$DOMAIN"
@@ -137,6 +187,7 @@ systemctl restart nginx
 
 echo -e "${GREEN}Domain Added Successfully${RESET}"
 echo "Laravel root: $WWW_DIR"
+
 ;;
 
 ##################################################
@@ -155,8 +206,11 @@ FLUSH PRIVILEGES;
 EOF
 
 echo -e "${GREEN}Database Created${RESET}"
+
 ;;
 
-4) exit ;;
+4)
+exit
+;;
 
 esac
