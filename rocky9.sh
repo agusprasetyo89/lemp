@@ -5,9 +5,9 @@
 package_list="nginx mariadb-server mariadb \
 php php-cli php-common php-opcache php-zip php-intl php-soap \
 php-gd php-mbstring php-curl php-bcmath php-xml php-fpm php-mysqlnd \
-postfix fail2ban cronie rsync cyrus-sasl-plain unzip git composer certbot python3-certbot-nginx"
+postfix fail2ban cronie rsync cyrus-sasl-plain unzip git composer certbot python3-certbot-nginx redis php-pecl-redis"
 
-service_list="nginx php-fpm mariadb postfix fail2ban crond"
+service_list="nginx php-fpm mariadb postfix fail2ban crond redis"
 
 RESET="\e[0m"
 RED="\e[31m"
